@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.swzlw.dao.ClaimDao" >
+
+    <resultMap id="ClaimResult" type="Claim">
+        <result property="id" column="id"/>
+        <result property="lostId" column="lostId"/>
+        <result property="lostName" column="lostName"/>
+        <result property="detail" column="detail"/>
+        <result property="claimId" column="claimId"/>
+        <result property="claimName" column="claimName"/>
+        <result property="handleMan" column="handleMan"/>
+        <result property="identify" column="identify"/>
+        <result property="claimDate" column="claimDate"/>
+        <result property="handleItem" column="handleItem"/>
+        <result property="handleDate" column="handleDate"/>
+        <result property="handleResult" column="handleResult"/>
+    </resultMap>
+    
+    <select id="findById" parameterType="Integer" resultMap="ClaimResult">
+        select * from t_lost_claim where id=#{id}
+    </select>
+
+    <select id="find" parameterType="Map" resultMap="ClaimResult">
+        SELECT * FROM t_lost_claim
+        <where>
+            <if test="handleResult!=null and handleResult!=''">
+                AND handleResult=#{handleResult}
+            </if>
+        </where>
+        <if test="start!=null and size!=null">
+            limit #{start},#{size}
+        </if>
+    </select>
+
+    
+    <select id="getTotal" parameterType="Map" resultType="Long">
+        SELECT COUNT(*) FROM t_lost_claim
+        <where>
+            <if test="handleResult!=null and handleResult!=''">
+                AND handleResult=#{handleResult}
+            </if>
+        </where>
+    </select>
+    
+    <insert id="add" parameterType="Claim">/*这个的顺序必须要和数据库的字段相对应，不然会出问题*/
+        INSERT INTO t_lost_claim VALUES (null,#{lostId},
+        #{lostName},#{detail},#{claimId},#{claimName},#{handleMan},
+        #{identify},#{claimDate},#{handleItem},#{handleDate},#{handleResult})
+    </insert>
+    
+    <update id="update" parameterType="Claim" >
+        update t_lost_claim
+        <set>
+            <if test="lostId!=null and lostId!=''">
+                lostId = #{lostId},
+            </if>
+            <if test="lostName!=null and lostName!=''">
+                lostName = #{lostName},
+            </if>
+            <if test="detail!=null and detail!=''">
+                detail = #{detail},
+            </if>
+            <if test="claimId!=null and claimId!=''">
+                claimId = #{claimId},
+            </if>
+            <if test="claimName!=null and claimName!=''">
+                claimName = #{claimName},
+            </if>
+            <if test="handleMan!=null and handleMan!=''">
+                handleMan = #{handleMan},
+            </if>
+            <if test="identify!=null and identify!=''">
+                identify = #{identify},
+            </if>
+            <if test="claimDate!=null and claimDate!=''">
+                claimDate = #{claimDate},
+            </if>
+            <if test="handleItem!=null and handleItem!=''">
+                handleItem = #{handleItem},
+            </if>
+            <if test="handleDate!=null and handleDate!=''">
+                handleDate = #{handleDate},
+            </if>
+            <if test="handleResult!=null and handleResult!=''">
+                handleResult = #{handleResult},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

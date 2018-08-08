@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.swzlw.dao.UserLossDao" >
+
+    <resultMap id="UserLossResult" type="UserLoss">
+        <result property="id" column="id"/>
+        <result property="userName" column="userName"/>
+        <result property="confirmLossDate" column="confirmLossDate"/>
+        <result property="lossReason" column="lossReason"/>
+        <result property="removeState" column="removeState"/>
+    </resultMap>
+
+    <select id="find" parameterType="Map" resultMap="UserLossResult">
+        SELECT * FROM t_user_loss
+        <where>
+            <if test="userName!=null and userName!=''">
+                AND userName LIKE #{userName}
+            </if>
+            <if test="confirmLossDatefrom!=null and confirmLossDatefrom!=''">
+                AND confirmLossDate &gt;= #{confirmLossDatefrom}
+            </if>
+            <if test="confirmLossDateto!=null and confirmLossDateto!=''">
+                AND confirmLossDate &lt;= #{confirmLossDateto}
+            </if>
+            <if test="removeState!=null">
+                AND removeState = #{removeState}
+            </if>
+        </where>
+        <if test="start!=null and size!=null">
+            limit #{start},#{size}
+        </if>
+    </select>
+
+    <select id="getTotal" parameterType="Map" resultType="Long">
+        SELECT count(*) FROM t_user_loss
+        <where>
+            <if test="userName!=null and userName!=''">
+                AND userName LIKE #{userName}
+            </if>
+            <if test="confirmLossDatefrom!=null and confirmLossDatefrom!=''">
+                AND confirmLossDate &gt;= #{confirmLossDatefrom}
+            </if>
+            <if test="confirmLossDateto!=null and confirmLossDateto!=''">
+                AND confirmLossDate &lt;= #{confirmLossDateto}
+            </if>
+            <if test="removeState!=null">
+                AND removeState = #{removeState}
+            </if>
+        </where>
+    </select>
+
+    <select id="findById" parameterType="Integer" resultMap="UserLossResult">
+        select * from t_user_loss where id=#{id}
+    </select>
+
+    <update id="update" parameterType="UserLoss">
+        update t_user_loss
+        <set>
+            <if test="confirmLossDate!=null">
+                confirmLossDate=#{confirmLossDate},
+            </if>
+            <if test="lossReason!=null and lossReason!=''">
+                lossReason=#{lossReason},
+            </if>
+            <if test="removeState!=null">
+                removeState=#{removeState},
+            </if>
+        </set>
+        where id=#{id}
+    </update>
+    
+    <insert id="add" parameterType="UserLoss">/*这个的顺序必须要和数据库的字段相对应，不然会出问题*/
+        INSERT INTO t_user_loss VALUES (null,#{userName},
+        #{confirmLossDate},#{lossReason},#{removeState})
+    </insert>
+</mapper>

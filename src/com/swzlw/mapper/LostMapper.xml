@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.swzlw.dao.LostDao" >
+    <resultMap id="LostGcResult" type="LostGc">
+        <result property="lostType" column="lostType"/>
+        <result property="lostNum" column="lostNum"/>
+    </resultMap>
+
+    <resultMap id="LostResult" type="Lost">
+        <result property="id" column="id"/>
+        <result property="lostName" column="lostName"/>
+        <result property="pickName" column="pickName"/>
+        <result property="pickDate" column="pickDate"/>
+        <result property="handleName" column="handleName"/>
+        <result property="handleDate" column="handleDate"/>
+        <result property="returnName" column="returnName"/>
+        <result property="returnDate" column="returnDate"/>
+        <result property="address" column="address"/>
+        <result property="lostNum" column="lostNum"/>
+        <result property="unit" column="unit"/>
+        <result property="outline" column="outline"/>
+        <result property="detail" column="detail"/>
+        <result property="returnState" column="returnState"/>
+        <result property="checkState" column="checkState"/>
+        <!--设置关联-->
+        <association property="pickMan" column="pickId" select="com.swzlw.dao.UserDao.findById"></association>
+        <association property="owner" column="ownerId" select="com.swzlw.dao.UserDao.findById"></association>
+    </resultMap>
+
+    <!--通过用户id来查看他的拾物情况，客户历史订单查询-->
+    <select id="find" parameterType="Map" resultMap="LostResult">
+        select * from t_lost
+        <where>
+            <if test="pickId!=null and pickId!=''">
+                and pickId = #{pickId}
+            </if>
+            <if test="lostName!=null and lostName!=''">
+                and lostName = #{lostName}
+            </if>
+            <if test="address!=null and address!=''">
+                and pickId = #{pickId}
+            </if>
+            <if test="outline!=null and outline!=''">
+                and outline = #{outline}
+            </if>
+            <if test="checkState!=null and checkState!=''">
+                and checkState = #{checkState}
+            </if>
+        </where>
+        <if test="start!=null and size!=null">
+            limit #{start},#{size}
+        </if>
+    </select>
+
+    <select id="getTotal" parameterType="Map" resultType="Long">
+        select count(*) from t_lost
+        <where>
+            <if test="pickId!=null and pickId!=''">
+                and pickId = #{pickId}
+            </if>
+        </where>
+    </select>
+
+    <select id="findById" parameterType="Integer" resultMap="LostResult">
+        select * from t_lost where id=#{id}
+    </select>
+
+    <select id="findLostGc" resultMap="LostGcResult">
+        SELECT lostName AS lostType, COUNT(lostName) AS lostNum FROM t_lost GROUP BY lostName
+    </select>
+    
+    <select id="findAll" resultMap="LostResult"><!-- 查找唯一的数据字典名称 -->
+        SELECT DISTINCT lostName FROM t_lost
+    </select>
+
+	<insert id="add" parameterType="Lost">
+        INSERT INTO t_lost VALUES (null,#{pickId},
+        0,#{lostName},#{pickName},#{pickDate},null,null,null,null,
+        #{address},#{lostNum},#{unit},#{outline},#{detail},#{returnState},#{checkState})
+    </insert>
+
+    <delete id="delete" parameterType="Integer">
+        DELETE FROM t_lost WHERE id=#{id}
+    </delete>
+
+    <update id="update" parameterType="Lost">
+        UPDATE t_lost
+        <set>
+            <if test="pickId!=null and pickId!=''">
+                pickId=#{pickId},
+            </if>
+            <if test="ownerId!=null and ownerId!=''">
+                ownerId=#{ownerId},
+            </if>
+            <if test="lostName!=null and lostName!=''">
+                lostName=#{lostName},
+            </if>
+            <if test="pickName!=null and pickName!=''">
+                pickName=#{pickName},
+            </if>
+            <if test="pickDate!=null and pickDate!=''">
+                pickDate=#{pickDate},
+            </if>
+            <if test="handleName!=null and handleName!=''">
+                handleName=#{handleName},
+            </if>
+            <if test="handleDate!=null and handleDate!=''">
+                handleDate=#{handleDate},
+            </if>
+            <if test="returnName!=null and returnName!=''">
+                returnName=#{returnName},
+            </if>
+            <if test="returnDate!=null and returnDate!=''">
+                returnDate=#{returnDate},
+            </if>
+            <if test="address!=null and address!=''">
+                address=#{address},
+            </if>
+            <if test="lostNum!=null and lostNum!=''">
+                lostNum=#{lostNum},
+            </if>
+            <if test="unit!=null and unit!=''">
+                unit=#{unit},
+            </if>
+            <if test="outline!=null and outline!=''">
+                outline=#{outline},
+            </if>
+            <if test="detail!=null and detail!=''">
+                detail=#{detail},
+            </if>
+            
+            <if test="returnState!=null and returnState!=''">
+                returnState=#{returnState},
+            </if>
+            <if test="checkState!=null and checkState!=''">
+                checkState=#{checkState},
+            </if>
+        </set>
+        WHERE id=#{id}
+    </update>
+</mapper>

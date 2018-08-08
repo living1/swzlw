@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.swzlw.dao.UserDao" >
+
+    <resultMap id="UserResult" type="User">
+        <result property="id" column="id"/>
+        <result property="userName" column="userName"/>
+        <result property="password" column="password"/>
+        <result property="trueName" column="trueName"/>
+        <result property="email" column="email"/>
+        <result property="phone" column="phone"/>
+        <result property="isSchool" column="isSchool"/>
+        <result property="institute" column="institute"/>
+        <result property="roleName" column="roleName"/>
+        <result property="refuseTime" column="refuseTime"/>
+    </resultMap>
+
+    <resultMap id="UserGxResult" type="UserGx">
+        <result property="name" column="userName"/>
+        <result property="pickNum" column="pickNum"/>
+    </resultMap>
+
+    <resultMap id="UserGcResult" type="UserGc">
+        <result property="userLevel" column="userLevel"/>
+        <result property="userNum" column="userNum"/>
+    </resultMap>
+    
+    <select id="login" parameterType="User" resultMap="UserResult">
+        select * from t_user where userName=#{userName} AND password=#{password} and roleName=#{roleName}
+    </select>
+    
+    <insert id="register" parameterType="User">/*这个的顺序必须要和数据库的字段相对应，不然会出问题*/
+        INSERT INTO t_user VALUES (null,#{userName},
+        #{password},#{trueName},#{roleName},#{pic},#{isSchool},
+        #{institute},#{email},#{phone},#{refuseTime})
+    </insert>
+
+    <select id="findById" parameterType="Integer" resultMap="UserResult">
+        select * from t_user where id=#{id}
+    </select>
+
+    <select id="find" parameterType="Map" resultMap="UserResult">
+        SELECT * FROM t_user
+        <where>
+            <if test="userName!=null and userName!=''">
+                AND userName LIKE #{userName}
+            </if>
+            <if test="isSchool!=null">
+                AND isSchool=#{isSchool}
+            </if>
+            <if test="institute!=null">
+                AND institute=#{institute}
+            </if>
+            <if test="roleName!=null">
+                AND roleName=#{roleName}
+            </if>
+        </where>
+        <if test="start!=null and size!=null">
+            limit #{start},#{size}
+        </if>
+    </select>
+
+    
+    <select id="getTotal" parameterType="Map" resultType="Long">
+        SELECT COUNT(*) FROM t_user
+        <where>
+            <if test="userName!=null and userName!=''">
+                AND userName LIKE #{userName}
+            </if>
+            <if test="isSchool!=null">
+                AND isSchool=#{isSchool}
+            </if>
+            <if test="institute!=null">
+                AND institute=#{institute}
+            </if>
+            <if test="roleName!=null">
+                AND roleName=#{roleName}
+            </if>
+        </where>
+    </select>
+    
+    <insert id="add" parameterType="User">/*这个的顺序必须要和数据库的字段相对应，不然会出问题*/
+        INSERT INTO t_user VALUES (null,#{userName},
+        #{password},#{trueName},#{roleName},#{pic},#{isSchool},
+        #{institute},#{email},#{phone},#{refuseTime})
+    </insert>
+    
+    <update id="update" parameterType="User" >
+        update t_user
+        <set>
+            <if test="userName!=null and userName!=''">
+                userName = #{userName},
+            </if>
+            <if test="password!=null and password!=''">
+                password = #{password},
+            </if>
+            <if test="trueName!=null and trueName!=''">
+                trueName = #{trueName},
+            </if>
+            <if test="pic!=null and pic!=''">
+                pic = #{pic},
+            </if>
+            <if test="isSchool!=null and isSchool!=''">
+                isSchool = #{isSchool},
+            </if>
+            <if test="institute!=null and institute!=''">
+                institute = #{institute},
+            </if>
+            <if test="email!=null and email!=''">
+                email = #{email},
+            </if>
+            <if test="phone!=null and phone!=''">
+                phone = #{phone},
+            </if>
+            <if test="refuseTime!=0">
+                refuseTime = #{refuseTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+    
+    <delete id="delete" parameterType="Integer">
+        DELETE FROM t_user WHERE id=#{id}
+    </delete>
+
+    <select id="findUserGx" parameterType="Map" resultMap="UserGxResult">
+        SELECT t1.userName,COUNT(t2.pickId) AS pickNum FROM t_user t1 LEFT JOIN t_lost t2 ON t1.`id`=t2.`pickId`
+        <where>
+            <if test="userName!=null and userName!=''">
+                and t1.userName like #{userName}
+            </if>
+        </where>
+        GROUP BY t1.id
+        <if test="start!=null and size!=null">
+            limit #{start},#{size}
+        </if>
+    </select>
+
+    <select id="getTotalUserGx" parameterType="Map" resultType="Long">
+        SELECT count(*) FROM t_user
+        <where>
+            <if test="userName!=null and userName!=''">
+                AND userName LIKE #{userName}
+            </if>
+        </where>
+    </select>
+
+    <select id="findUserGc" resultMap="UserGcResult">
+       SELECT institute AS userLevel, COUNT(institute) AS userNum FROM t_user GROUP BY institute
+    </select>
+</mapper>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.swzlw.dao.DataDicDao" >
+
+    <resultMap type="DataDic" id="DataDicResult">
+        <result property="id" column="id"/>
+        <result property="dataDicName" column="dataDicName"/>
+        <result property="dataDicValue" column="dataDicValue"/>
+    </resultMap>
+
+    <select id="find" parameterType="Map" resultMap="DataDicResult">
+        select * from t_dataDic
+        <where>
+            <if test="dataDicName!=null and dataDicName!=''">
+                and dataDicName = #{dataDicName}
+            </if><!-- 模糊查询的%%都被封装在dataDicName里面了 -->
+            <if test="dataDicValue!=null and dataDicValue!=''">
+                and dataDicValue like #{dataDicValue}
+            </if>
+        </where>
+        <if test="start!=null and size!=null">
+            limit #{start},#{size}
+        </if>
+    </select>
+
+    <select id="findAll" resultMap="DataDicResult"><!-- 查找唯一的数据字典名称 -->
+        select distinct dataDicName from t_dataDic
+    </select>
+    
+    <select id="findAll1" resultMap="DataDicResult"><!-- 查找唯一的数据字典名称 -->
+        SELECT DISTINCT dataDicValue FROM t_datadic WHERE dataDicName='失物类型'
+    </select>
+
+    <select id="getTotal" parameterType="Map" resultType="Long">
+        select count(*) from t_dataDic
+        <where>
+            <if test="dataDicName!=null and dataDicName!=''">
+                and dataDicName = #{dataDicName}
+            </if><!-- 模糊查询的%%都被封装在dataDicName里面了 -->
+            <if test="dataDicValue!=null and dataDicValue!=''">
+                and dataDicValue like #{dataDicValue}
+            </if>
+        </where>
+    </select>
+
+    <insert id="add" parameterType="DataDic">
+        insert into t_dataDic values(null,#{dataDicName},#{dataDicValue});
+    </insert>
+
+    <update id="update" parameterType="DataDic">
+        update t_dataDic
+        <set><!-- set能够自动把最后一逗号删掉，因为这里不确定有几个字段，所以全都写上并且加以判断 -->
+            <if test="dataDicName!=null and dataDicName!=''">
+                dataDicName=#{dataDicName},
+            </if>
+            <if test="dataDicValue!=null and dataDicValue!=''">
+                dataDicValue=#{dataDicValue},
+            </if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <delete id="delete" parameterType="Integer">
+        delete from t_dataDic where id=#{id}
+    </delete>
+</mapper>

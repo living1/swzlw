@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.swzlw.dao.UserReprieveDao" >
+    <resultMap type="UserReprieve" id="UserReprieveResult">
+        <result property="id" column="id"/>
+        <result property="measure" column="measure"/>
+        <!-- 设置关联 -->
+        <association property="userLoss" column="lossId" select="com.swzlw.dao.UserLossDao.findById"></association>
+    </resultMap>
+
+    <select id="find" parameterType="Map" resultMap="UserReprieveResult">
+        select * from t_user_reprieve
+        <where>
+            <if test="lossId!=null and lossId!=''">
+                and lossId = #{lossId}
+            </if>
+        </where>
+        <if test="start!=null and size!=null">
+            limit #{start},#{size}
+        </if>
+    </select>
+
+    <select id="getTotal" parameterType="Map" resultType="Long">
+        select count(*) from t_user_reprieve
+        <where>
+            <if test="lossId!=null and lossId!=''">
+                and lossId = #{lossId}
+            </if>
+        </where>
+    </select>
+
+    <insert id="add" parameterType="UserReprieve">
+        insert into t_user_reprieve values(null,#{userLoss.id},#{measure});
+    </insert>
+
+    <update id="update" parameterType="UserReprieve"><!-- 根据业务上，所属客户不能更新 -->
+        update t_user_reprieve
+        <set><!-- set能够自动把最后一逗号删掉，因为这里不确定有几个字段，所以全都写上并且加以判断 -->
+            <if test="measure!=null and measure!=''">
+                measure=#{measure},
+            </if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <delete id="delete" parameterType="Integer">
+        delete from t_user_reprieve where id=#{id}
+    </delete>
+</mapper>
